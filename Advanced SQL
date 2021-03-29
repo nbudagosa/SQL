@@ -1,4 +1,4 @@
-```sql
+sql
 -- using WITH clause
 WITH 
 	selected_countries AS (
@@ -53,7 +53,7 @@ ORDER BY 2,3 DESC;
 
 
 
-```sql
+sql
 -- window functions (related subqueries)
 SELECT * FROM (
     SELECT 
@@ -91,7 +91,7 @@ FROM (
 
 
 
-```sql
+sql
 -- export result to text file
 .output result.txt
 .output
@@ -138,7 +138,7 @@ ORDER BY 4 DESC;
 
 
 
-```sql
+sql
 drop table if exists students;
 drop table if exists majors;
 drop table if exists locations;
