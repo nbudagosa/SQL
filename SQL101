@@ -1,0 +1,87 @@
+-- select all columns from a table
+SELECT * FROM customers;
+
+
+
+-- we can use select to do basic calculation
+SELECT 10 + 20;
+SELECT 10 * 2;
+SELECT 10 / 2;
+SELECT 10 - 5;
+
+
+
+-- select columns from table
+SELECT
+	firstname,
+	lastname,
+	country
+FROM customers;
+
+
+
+-- create/ transform columns
+SELECT
+	firstname,
+	lastname,
+	firstname || ' ' || lastname AS fullname,
+	LOWER(firstname) || '@company.com' AS email
+FROM customers;
+
+
+
+
+-- CASE is like IF-ELSE in Google Sheets
+SELECT 
+	company,
+	CASE
+		WHEN company IS NOT NULL THEN 'Corporate'
+		ELSE 'End Customer'
+	END AS segment
+FROM customers;
+
+
+
+
+-- STRFTIME is a specific function for SQLite
+SELECT 
+	invoicedate,
+	STRFTIME('%Y', invoicedate) AS year,
+	STRFTIME('%m', invoicedate) AS month,
+	STRFTIME('%d', invoicedate) AS day
+FROM invoices;
+
+
+
+-- review join syntax
+SELECT 
+	A.column,
+	B.column
+FROM tableA AS A
+JOIN tableB AS B
+	ON A.primary_key = B.foreign_key;
+
+
+
+-- Example Join in the video
+SELECT
+	art.artistid,
+	art.name,
+	alb.title,
+	tra.name,
+	tra.composer
+FROM artists AS art
+JOIN albums  AS alb 
+	ON art.artistid = alb.artistid 
+JOIN tracks  AS tra
+  ON tra.albumid = alb.albumid
+-- WHERE is used after JOINs completed
+WHERE art.name = 'Aerosmith';
+
+
+
+
+-- Random Sampling Example
+SELECT name FROM tracks
+ORDER BY RANDOM() 
+LIMIT 10;

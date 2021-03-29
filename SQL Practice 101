@@ -1,0 +1,52 @@
+-- select all columns from customers table 
+-- value function -> change format of that columns 
+SELECT 
+	firstname, 
+    lastname,
+    firstname || ' ' || lastname  AS fullName,
+    UPPER(firstname) || SUBSTR(lastname, 1, 1) ||  '@fullstack.com' AS email 
+FROM customers;
+
+
+
+
+
+-- round decimal numbers
+SELECT 
+	name, 
+    ROUND(milliseconds/ 60000.0, 2)    AS minutes, -- value function 
+    ROUND(bytes/ (1024*1024.0) , 4)    AS mb
+FROM tracks;
+
+
+
+
+
+-- format date column (actually it's text in SQLite)
+SELECT 
+	invoicedate, 
+	CAST(STRFTIME('%Y', invoicedate) AS INT)  AS year,
+  CAST(STRFTIME('%m', invoicedate) AS INT)  AS month,
+  CAST(STRFTIME('%d', invoicedate) AS INT)  AS day,
+  STRFTIME('%Y-%m', invoicedate)   AS monthID
+FROM invoices WHERE year = 2013 AND month = 9;
+
+
+
+
+
+-- cast used to convert data type in SQL 
+SELECT 
+	CAST( 100    AS TEXT),
+	CAST('100'   AS INT),
+	CAST('100.0' AS REAL);
+
+-- date in SQLite is TEXT 
+SELECT TYPEOF(invoicedate) FROM invoices;
+
+
+
+
+-- filter data with WHERE clause
+SELECT firstname, lastname FROM customers
+WHERE UPPER(country) IN ('UNITED KINGDOM', 'USA', 'CANADA');

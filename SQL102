@@ -1,0 +1,157 @@
+-- filter data with WHERE clause
+SELECT * FROM customers
+WHERE country = 'USA';
+
+SELECT * FROM customers
+WHERE UPPER(country) = 'USA';
+
+SELECT * FROM customers
+WHERE country = 'USA' AND state = 'CA';
+
+SELECT * FROM customers
+WHERE country = 'USA' OR country = 'Canada';
+
+SELECT * FROM customers 
+WHERE NOT (country = 'USA' OR country = 'Canada');
+
+
+
+-- IN operator
+SELECT * FROM customers
+WHERE country IN ('USA', 'Canada', 'Belgium');
+
+
+
+-- IN operator
+SELECT * FROM customers
+WHERE country NOT IN ('USA', 'Canada', 'Belgium');
+
+
+
+-- BETWEEN AND
+SELECT * FROM customers
+WHERE customerID BETWEEN 5 AND 10; -- inclusive
+
+SELECT * FROM customers 
+WHERE customerID >= 5 AND customerID <= 10;
+
+
+
+-- BETWEEN AND with DATE TIME column
+SELECT * FROM invoices
+WHERE invoicedate BETWEEN '2009-01-01 00:00:00' AND '2009-01-31 20:00:00';
+
+
+
+
+-- NULL
+SELECT * FROM customers
+WHERE company IS NULL;
+
+SELECT * FROM customers
+WHERE company IS NOT NULL;
+
+
+
+-- Pattern Machting
+SELECT * FROm customers
+WHERE email LIKE '%@gmail.com'
+
+SELECT * FROm customers
+WHERE email NOT LIKE '%@gmail.com'
+
+
+
+--Find customers with phone number include 99
+SELECT * FROM customers
+WHERE phone LIKE '%99%';
+
+
+
+-- Find customers firstname like 'John' etc.
+SELECT * FROM customers
+WHERE firstname LIKE 'J_hn';
+
+
+
+-- replace NULL with desired values
+SELECT 
+  company,
+  COALESCE(company, 'End Customer') AS cleanCompany
+FROM customers;
+
+
+
+-- replace NULL with desired values
+SELECT 
+  company,
+  CASE WHEN company IS NULL THEN 'End Customer'
+       ELSE 'Corporate'
+  END AS segment
+FROM customers;
+
+
+
+-- join table with WHERE clause, two tables
+SELECT
+	artists.artistid,
+  artists.name AS artist_name,
+  albums.title AS album_name
+FROM artists, albums, tracks  
+WHERE artists.artistid = albums.artistid -- PK = FK
+  AND artists.artistid IN (8, 100, 120);
+
+
+
+-- join table with WHERE clause, three tables
+SELECT
+	artists.artistid,
+  artists.name AS artist_name,
+  albums.title AS album_name,
+  tracks.name  AS song_name
+FROM artists, albums, tracks  
+WHERE artists.artistid = albums.artistid -- PK = FK
+  AND albums.albumid = tracks.albumid
+  AND artists.artistid IN (8, 100, 120);
+
+
+
+-- Aggregate Functions 
+SELECT
+	ROUND(AVG(milliseconds), 2) AS avg_mill,
+  SUM(milliseconds)           AS sum_mill,
+  MIN(milliseconds)           AS min_mill,
+  MAX(milliseconds)           AS max_mill,
+  COUNT(milliseconds)         AS count_mill
+FROM tracks;
+
+-- COUNT DISTINCT 
+SELECT COUNT(DISTINCT country), COUNT(*) FROM customers;
+
+-- Aggregate functions with GROUP BY clause
+SELECT genres.name, COUNT(*) AS count_songs 
+FROM genres, tracks 
+WHERE genres.genreid = tracks.genreid
+GROUP BY genres.name;
+
+
+
+-- Filter groups
+SELECT 
+	  genres.name, 
+    COUNT(*) AS count_songs 
+FROM genres, tracks 
+WHERE genres.genreid = tracks.genreid AND genres.name <> 'Rock'
+GROUP BY genres.name
+HAVING COUNT(*) >= 100 ;
+
+
+
+-- Order By + Limit 
+SELECT 
+    genres.name, 
+    COUNT(*) 
+FROM genres 
+JOIN tracks ON genres.genreid = tracks.genreid
+GROUP BY genres.name
+ORDER BY COUNT(*) DESC LIMIT 5; -- desc = descending order

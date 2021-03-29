@@ -1,0 +1,26 @@
+-- get data from multiple tables with WHERE clause
+-- same result as INNER JOIN
+SELECT 
+    artists.ArtistId,
+    artists.Name ArtistName,
+    albums.Title AlbumName,
+    tracks.Name  Song,
+    genres.Name  GenreName
+FROM artists, albums, tracks, genres  
+WHERE artists.artistid = albums.artistid
+  AND albums.albumid = tracks.albumid
+  AND tracks.genreid = genres.genreid;
+  
+  
+  
+  
+  
+  -- count data and group by column ArtistName
+SELECT
+	  A.name ArtistName,
+    COUNT(B.title) N_Albums
+FROM artists A 
+INNER JOIN albums B ON A.artistid = B.artistid
+GROUP BY A.name
+ORDER BY COUNT(B.title) DESC 
+LIMIT 10;

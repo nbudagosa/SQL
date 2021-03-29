@@ -1,0 +1,327 @@
+```sql
+-- using WITH clause
+WITH 
+	selected_countries AS (
+  	SELECT * FROM customers
+    WHERE country IN ('USA', 'United Kingdom', 'Canada')
+  ),
+  	invoice2010 AS (
+  	SELECT customerid, invoicedate, total FROM invoices
+	WHERE STRFTIME('%Y', invoicedate) = '2010'  
+  )
+  
+SELECT 
+	firstname || lastname AS fullname, 
+    country,
+    SUM(total) AS total 
+FROM selected_countries 
+JOIN invoice2010 USING(customerid)
+GROUP BY 1,2
+ORDER BY 2,3 DESC;
+
+-- using subqueries
+SELECT 
+		firstname || lastname AS fullname, 
+    country,
+    SUM(total) AS total 
+FROM (
+  	SELECT * FROM customers
+    WHERE country IN ('USA', 'United Kingdom', 'Canada')
+  ) sub1
+JOIN (
+  	SELECT customerid, invoicedate, total FROM invoices
+		WHERE STRFTIME('%Y', invoicedate) = '2010'  
+  ) sub2
+ON sub1.customerid = sub2.customerid 
+GROUP BY 1,2
+ORDER BY 2,3 DESC;
+
+-- using joins
+SELECT 
+		firstname || lastname AS fullname, 
+    country,
+    SUM(total) AS total 
+FROM customers A
+INNER JOIN invoices  B 
+ON A.customerid = B.customerid -- PK = FK
+		WHERE A.country IN ('USA', 'United Kingdom', 'Canada')
+    AND STRFTIME('%Y', B.invoicedate) = '2010'
+GROUP BY 1,2
+ORDER BY 2,3 DESC;
+
+
+
+
+
+```sql
+-- window functions (related subqueries)
+SELECT * FROM (
+    SELECT 
+        firstname, 
+        lastname, 
+        country,
+        COUNT(*) OVER(PARTITION BY country) AS total_customers 
+    FROM customers
+  )
+WHERE total_customers <= 5;
+
+-- sum over running total
+SELECT *, SUM(revenue) OVER(ORDER BY year) AS running_total
+FROM (
+    SELECT 
+        STRFTIME('%Y', invoicedate) YEAR, 
+        ROUND(SUM(total), 2) revenue 
+    FROM invoices
+    GROUP BY 1
+ );
+
+-- lag and compute difference (growth)
+SELECT year, revenue, ROUND(revenue - lag_revenue,2) AS change 
+FROM (
+  SELECT *, LAG(revenue, 1) OVER() AS lag_revenue
+  FROM (
+      SELECT 
+          STRFTIME('%Y', invoicedate) YEAR, 
+          ROUND(SUM(total), 2) revenue 
+      FROM invoices
+      GROUP BY 1
+  )
+);
+
+
+
+
+```sql
+-- export result to text file
+.output result.txt
+.output
+
+-- run sql script in command line
+.read file.sql
+
+.mode column
+.header on
+
+.open database.db
+.shell clear
+
+.table
+.schema
+
+-- import csv file to table
+.mode csv
+.import gpa.csv gpa
+select * from gpa;
+
+-- https://www.sqlitetutorial.net/sqlite-tutorial/sqlite-describe-table/
+
+
+
+
+
+WITH 
+	usa_customers AS (
+	SELECT * FROM customers 
+	WHERE country = 'USA'
+), 
+	invoice_2010 AS (
+	SELECT customerid, total FROM invoices 
+	WHERE strftime('%Y', invoicedate) = '2010' 
+)
+
+SELECT firstname, lastname, country, SUM(total) 
+FROM usa_customers, invoice_2010
+WHERE usa_customers.customerid = invoice_2010.customerid
+GROUP BY 1,2,3
+ORDER BY 4 DESC;
+
+
+
+
+```sql
+drop table if exists students;
+drop table if exists majors;
+drop table if exists locations;
+
+create table students (
+    id int primary key,
+    firstname text,
+    lastname text,
+    major int,
+    FOREIGN KEY (major) REFERENCES majors(major_id)
+);
+
+create table majors (
+    major_id int primary key,
+    name text
+);
+
+create table locations (
+    firstname text,
+    lastname text,
+    city text,
+    PRIMARY KEY (firstname, lastname),
+    FOREIGN KEY (firstname, lastname) REFERENCES students (firstname, lastname)
+);
+
+insert into students values 
+    (1, 'David', 'Eagle', 1),
+    (2, 'Mary', 'Anne', 2),
+    (3, 'John', 'Travolta', 2);
+
+insert into majors values 
+    (1, 'Economics'),
+    (2, 'Data Science');
+
+insert into locations values 
+    ('David', 'Eagle', 'New York'),
+    ('Mary', 'Anne', 'Moscow'),
+    ('John', 'Keleher', 'London');
+
+
+
+
+
+drop table if exists test;
+
+create table test (
+    id int,
+    money real not null,
+    currency text default 'USA'
+);
+
+
+
+
+-- using case when with aggregate function
+SELECT 
+	CASE WHEN company IS NULL THEN 'End Customers'
+		ELSE 'Corporate'
+	END AS segment,
+	COUNT(*) count_segment
+FROM customers
+GROUP BY 1;
+
+-- find proportion of end customers
+SELECT AVG(segment) AS 'prop_EndCustomers', 49/59.0 FROM (
+	SELECT 
+		CASE WHEN company IS NULL THEN 1
+			ELSE 0
+		END AS segment
+	FROM customers
+);
+
+
+
+
+-- basic subqueries
+SELECT * FROM tracks 
+WHERE bytes = (SELECT MAX(bytes) FROM tracks);
+
+-- another basic subqueries
+SELECT * FROM (
+	select firstname, lastname, country 
+	FROM customers 
+	WHERE country IN ('USA', 'Canada', 'United Kingdom')
+) sub
+ORDER BY country, firstname ;
+
+-- subqueries to compute proportion
+SELECT country, count(*), count(*)/ (select CAST(COUNT(*) AS REAL) from customers) 
+FROM customers 
+GROUP BY 1 
+ORDER BY 2 DESC;
+
+-- subqueries with window functions
+SELECT country, N/ CAST(total AS REAL) AS percent FROM (
+	SELECT 
+		country, 
+		count(*) N,
+		(select count(*) over() from customers ) total
+	FROM customers 
+	GROUP BY 1 
+	ORDER BY 2 DESC
+);
+
+
+
+
+
+```sql
+-- basic window functions
+SELECT firstname, lastname, COUNT(*) OVER() FROM customers;
+
+-- subquery on top of window functions
+SELECT * FROM (
+	SELECT firstname, lastname, row_number() OVER() rowNum 
+	FROM customers
+) 
+WHERE rowNum BETWEEN 10 AND 15;
+
+-- ntile 
+SELECT name, bytes, NTILE(4) OVER(ORDER BY bytes) AS groups 
+FROM tracks
+ORDER BY 2;
+
+-- sum cumulative distribution
+SELECT 
+	*, 
+	SUM(revenue) OVER(ORDER BY year) FROM (
+		SELECT strftime('%Y', invoicedate) year, SUM(total) revenue 
+		FROM invoices
+		GROUP BY 1
+);
+
+-- lag revenue 1 period
+SELECT 
+	*, 
+	LAG(revenue, 1) OVER() lag_revenue FROM (
+		SELECT strftime('%Y', invoicedate) year, SUM(total) revenue 
+		FROM invoices
+		GROUP BY 1
+);
+
+-- rank and dense_rank
+DROP TABLE if exists student_gpa;
+
+CREATE TABLE student_gpa (
+	id int,
+	name text, 
+	gpa real 
+);
+
+INSERT INTO student_gpa VALUES 
+	(1, 'Anne', 2.58),
+	(2, 'David', 3.50),
+	(3, 'John', 3.50),
+	(4, 'Mary', 2.98),
+	(5, 'Kevin', 3.25),
+	(6, 'Maine', 3.12),
+	(7, 'Belle', 3.95),
+	(8, 'Liam', 3.25);
+
+SELECT *, RANK() OVER(ORDER BY gpa)  
+FROM student_gpa;
+
+-- TO DO - find top spenders in each country
+SELECT *, RANK() OVER(PARTITION BY country ORDER BY total ) FROM (
+	SELECT
+		firstname || ' ' || lastname AS fullname,
+		country,
+		SUM(total) total
+	FROM customers
+	JOIN invoices USING(CustomerId)
+	GROUP BY 1, 2
+);
+
+SELECT * FROM (
+	SELECT *, RANK() OVER(PARTITION BY country ORDER BY total) top_spenders FROM (
+		SELECT
+			firstname || ' ' || lastname AS fullname,
+			country,
+			SUM(total) total
+		FROM customers
+		JOIN invoices USING(CustomerId)
+		GROUP BY 1, 2
+	)
+) WHERE top_spenders <= 2;
