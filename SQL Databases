@@ -1,0 +1,138 @@
+SELECT 
+	genres.name,
+	COUNT(*) n_songs,
+    SUM(tracks.bytes) total_bytes,
+    AVG(tracks.bytes) avg_bytes
+FROM genres 
+JOIN tracks ON genres.GenreId = tracks.GenreId
+WHERE genres.name <> 'Rock' -- not include Rock genre
+GROUP BY genres.name
+HAVING n_songs < 300 -- filter groups after group by
+ORDER BY n_songs DESC 
+LIMIT 5; -- descending order
+
+
+
+
+-- invoices in 2010 
+/* SELECT 
+	customerid, 
+    invoicedate, 
+    total 
+FROM invoices
+WHERE STRFTIME('%Y', invoicedate) = '2010'; */
+
+-- customers in USA, Canada
+/*SELECT customerid, country FROM customers  
+WHERE country = 'USA' OR country = 'Canada'; */
+
+-- subqueries
+SELECT country, SUM(total) FROM customers 
+JOIN (
+  	SELECT 
+      customerid, 
+      invoicedate, 
+      total 
+	FROM invoices
+	WHERE STRFTIME('%Y', invoicedate) = '2010'
+  ) AS sub
+ON customers.customerid = sub.customerid
+WHERE country IN ('USA', 'Canada', 'United Kingdom')
+GROUP BY country;
+
+
+
+
+
+SELECT * FROM (
+    SELECT 
+        firstname, 
+        lastname, 
+        country, 
+        COUNT(*) OVER(PARTITION BY country) AS n_customers
+    FROM customers
+ )
+WHERE n_customers >= 5;
+
+
+
+
+-- pure window function 
+-- ROW_NUMBER() 
+
+/* SELECT * FROM (
+    SELECT 
+        firstname, lastname, country,
+        ROW_NUMBER() OVER() AS rowNum
+    FROM customers
+  )
+WHERE rowNum BETWEEN 10 AND 15; */
+
+SELECT * FROM (
+    SELECT 
+        firstname, lastname, country,
+        ROW_NUMBER() OVER(PARTITION BY country ORDER BY firstname DESC) AS rowNum
+    FROM customers
+)
+WHERE rowNum = 1;
+
+
+
+
+-- pure window function 
+-- ROW_NUMBER() 
+
+/* SELECT * FROM (
+    SELECT 
+        firstname, lastname, country,
+        ROW_NUMBER() OVER() AS rowNum
+    FROM customers
+  )
+WHERE rowNum BETWEEN 10 AND 15; */
+
+SELECT * FROM (
+    SELECT 
+        firstname, lastname, country,
+        ROW_NUMBER() OVER(PARTITION BY country ORDER BY firstname DESC) AS rowNum
+    FROM customers
+)
+WHERE rowNum = 1;
+
+
+
+
+
+sql
+-- drop table
+DROP TABLE student;
+DROP TABLE address;
+
+-- create table
+CREATE TABLE student (
+    id INT PRIMARY KEY,
+    name TEXT NOT NULL,
+    major TEXT NOT NULL,
+    gpa REAL
+);
+
+CREATE TABLE address (
+    address_id INT PRIMARY KEY,
+    student_id INT,
+    city TEXT NOT NULL,
+    country TEXT NOT NULL,
+    FOREIGN KEY (student_id) REFERENCES student(id)
+);
+
+-- insert data into tables
+INSERT INTO student VALUES 
+    (1001, 'David', 'Economics', 3.56),
+    (1002, 'Mary', 'Economics', 3.89),
+    (1003, 'John', 'Business', 2.75),
+    (1004, 'Kevin', 'Engineer', 3.42),
+    (1005, 'Toy', 'Data Science', 3.25);
+
+INSERT INTO address VALUES 
+    (1, 1001, 'Bangkok', 'Thailand'),
+    (2, 1002, 'London', 'UK'),
+    (3, 1003, 'London', 'UK'),
+    (4, 1004, 'New York', 'USA');
