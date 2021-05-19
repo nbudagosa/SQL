@@ -30,14 +30,16 @@ WHERE country NOT IN ('USA', 'Canada', 'Belgium');
 
 -- BETWEEN AND
 SELECT * FROM customers
-WHERE customerID BETWEEN 5 AND 10; -- inclusive
+WHERE customerID BETWEEN 5 AND 10; 
 
+
+-- inclusive กำหนดเงื่อนไขในการดึงข้อมูลทำได้หลายเงื่อนไข
 SELECT * FROM customers 
 WHERE customerID >= 5 AND customerID <= 10;
 
 
 
--- BETWEEN AND with DATE TIME column
+-- BETWEEN AND with DATE TIME column ใช้กำหนดเงื่อนไขดึงข้อมูล
 SELECT * FROM invoices
 WHERE invoicedate BETWEEN '2009-01-01 00:00:00' AND '2009-01-31 20:00:00';
 
