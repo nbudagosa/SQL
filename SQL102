@@ -44,10 +44,11 @@ WHERE invoicedate BETWEEN '2009-01-01 00:00:00' AND '2009-01-31 20:00:00';
 
 
 
--- NULL
+-- ดึง missing value ขึ้นมาแก้ไข
 SELECT * FROM customers
 WHERE company IS NULL;
 
+-- ตัด missing value ออกไปดึงเฉพาะข้อมูลที่สมบูรณ์
 SELECT * FROM customers
 WHERE company IS NOT NULL;
 
