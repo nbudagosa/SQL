@@ -22,7 +22,7 @@ FROM tracks;
 
 
 
--- format date column (actually it's text in SQLite)
+-- format date column (actually it's text in SQLite) และ filter data
 SELECT 
 	invoicedate, 
 	CAST(STRFTIME('%Y', invoicedate) AS INT)  AS year,
