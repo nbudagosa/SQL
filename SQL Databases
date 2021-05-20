@@ -22,9 +22,13 @@ LIMIT 5; -- descending order
 FROM invoices
 WHERE STRFTIME('%Y', invoicedate) = '2010'; */
 
+
+
 -- customers in USA, Canada
 /*SELECT customerid, country FROM customers  
 WHERE country = 'USA' OR country = 'Canada'; */
+
+
 
 -- subqueries
 SELECT country, SUM(total) FROM customers 
@@ -102,7 +106,7 @@ WHERE rowNum = 1;
 
 
 
-sql
+
 -- drop table
 DROP TABLE student;
 DROP TABLE address;
@@ -122,6 +126,8 @@ CREATE TABLE address (
     country TEXT NOT NULL,
     FOREIGN KEY (student_id) REFERENCES student(id)
 );
+
+
 
 -- insert data into tables
 INSERT INTO student VALUES 
