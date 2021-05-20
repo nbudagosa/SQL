@@ -1,4 +1,3 @@
-sql
 -- using WITH clause
 WITH 
 	selected_countries AS (
@@ -53,7 +52,7 @@ ORDER BY 2,3 DESC;
 
 
 
-sql
+
 -- window functions (related subqueries)
 SELECT * FROM (
     SELECT 
@@ -91,7 +90,7 @@ FROM (
 
 
 
-sql
+
 -- export result to text file
 .output result.txt
 .output
@@ -247,7 +246,7 @@ SELECT country, N/ CAST(total AS REAL) AS percent FROM (
 
 
 
-```sql
+sql
 -- basic window functions
 SELECT firstname, lastname, COUNT(*) OVER() FROM customers;
 
