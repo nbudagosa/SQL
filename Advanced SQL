@@ -137,7 +137,6 @@ ORDER BY 4 DESC;
 
 
 
-sql
 drop table if exists students;
 drop table if exists majors;
 drop table if exists locations;
@@ -246,9 +245,11 @@ SELECT country, N/ CAST(total AS REAL) AS percent FROM (
 
 
 
-sql
+
 -- basic window functions
 SELECT firstname, lastname, COUNT(*) OVER() FROM customers;
+
+
 
 -- subquery on top of window functions
 SELECT * FROM (
@@ -257,10 +258,16 @@ SELECT * FROM (
 ) 
 WHERE rowNum BETWEEN 10 AND 15;
 
--- ntile 
+
+
+-- ntile is an analytic function. It divides an ordered data set into a number of buckets indicated 
+--by expr and assigns the appropriate bucket number to each row
+
 SELECT name, bytes, NTILE(4) OVER(ORDER BY bytes) AS groups 
 FROM tracks
 ORDER BY 2;
+
+
 
 -- sum cumulative distribution
 SELECT 
@@ -271,6 +278,7 @@ SELECT
 		GROUP BY 1
 );
 
+
 -- lag revenue 1 period
 SELECT 
 	*, 
@@ -280,6 +288,7 @@ SELECT
 		GROUP BY 1
 );
 
+
 -- rank and dense_rank
 DROP TABLE if exists student_gpa;
 
@@ -288,6 +297,7 @@ CREATE TABLE student_gpa (
 	name text, 
 	gpa real 
 );
+
 
 INSERT INTO student_gpa VALUES 
 	(1, 'Anne', 2.58),
@@ -301,6 +311,7 @@ INSERT INTO student_gpa VALUES
 
 SELECT *, RANK() OVER(ORDER BY gpa)  
 FROM student_gpa;
+
 
 -- TO DO - find top spenders in each country
 SELECT *, RANK() OVER(PARTITION BY country ORDER BY total ) FROM (
